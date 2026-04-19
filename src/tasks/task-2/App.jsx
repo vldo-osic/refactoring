@@ -1,21 +1,60 @@
-import React, { useState, useEffect } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+
+// /constants
+const TODOS_ENDPOIND = 'https://jsonplaceholder.typicode.com/todos';
+
+// /components
+export const List = memo(({ todos, onToggleTodo }) => {
+	return (
+		<ul>
+			{todos?.map(({ id, completed, title }) => (
+				<li key={id} >
+					<button
+						onClick={() => onToggleTodo(id)}
+						type='button'
+						style={{
+							textDecoration: completed ? 'line-through' : undefined,
+							cursor: 'pointer',
+							display: 'inline-block',
+						}}
+					>
+						{title}
+					</button>
+				</li>
+			))}
+		</ul>
+	);
+});
+
+async function fetchTodos() {
+	try {
+		const response = await fetch(TODOS_ENDPOIND);
+		const data = await response.json();
+
+		return data;
+	} catch (err) {
+		console.error(err);
+
+		return []
+	}
+}
 
 const BuggyTodo = () => {
 	const [todos, setTodos] = useState([]);
 	const [newTodo, setNewTodo] = useState('');
-	let [completedCount, setCompletedCount] = useState(0);
+
+	const completedCount = useMemo(
+		() => todos.filter((todo) => todo.completed).length,
+		[todos],
+	);
 
 	useEffect(() => {
-		fetchTodos();
-	});
+		fetchTodos().then((data) => setTodos(data));
+	}, []);
 
-	async function fetchTodos() {
-		const response = await fetch(
-			'https://jsonplaceholder.typicode.com/todos',
-		);
-		const data = await response.json();
-		setTodos(data);
-	}
+	useEffect(() => {
+		document.title = `${completedCount} tasks completed`;
+	}, [completedCount]);
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
@@ -24,53 +63,37 @@ const BuggyTodo = () => {
 		setTodos([
 			...todos,
 			{
-				id: todos.length + 1,
+				id: crypto.randomUUID(),
 				title: newTodo,
 				completed: false,
 			},
 		]);
 	};
 
-	const toggleTodo = (id) => {
-		const updatedTodos = todos.map((todo) => {
-			if (todo.id === id) {
-				completedCount += todo.completed ? -1 : 1;
-				return { ...todo, completed: !todo.completed };
-			}
-			return todo;
+	const handleToggle = useCallback((id) => {
+		setTodos((prevTodos) => {
+			return prevTodos.map((todo) =>
+				todo.id === id ? { ...todo, completed: !todo.completed } : todo,
+			);
 		});
-		setTodos(updatedTodos);
-	};
-
-	useEffect(() => {
-		document.title = `${completedCount} tasks completed`;
 	}, []);
 
 	return (
-		<div class="todo-container">
+		<div className="todo-container">
 			<h1>Buggy Todo List</h1>
 			<form onSubmit={handleSubmit}>
-				<input
-					type="text"
-					value={newTodo}
-					onChange={(e) => setNewTodo(e.target.value)}
-					placeholder="Add new todo"
-				/>
+				<label>
+					<input
+						name="new-todo"
+						type="text"
+						value={newTodo}
+						onChange={(e) => setNewTodo(e.target.value)}
+						placeholder="Add new todo"
+					/>
+				</label>
 				<button type="submit">Add Todo</button>
 			</form>
-			<ul>
-				{todos?.map((todo) => (
-					<li
-						key={todo.id}
-						style={{
-							textDecoration: todo.completed && 'line-through',
-						}}
-						onClick={() => toggleTodo(todo.id)}
-					>
-						{todo.title}
-					</li>
-				))}
-			</ul>
+			<List todos={todos} onToggleTodo={handleToggle} />
 			<div>Completed tasks: {completedCount}</div>
 		</div>
 	);

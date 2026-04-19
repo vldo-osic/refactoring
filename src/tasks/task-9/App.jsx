@@ -1,12 +1,16 @@
- import React, { Component } from "react";
+ import { Component } from "react";
 
 export default class App extends Component {
     onClick = (event) => {
-        this.setState({ event });
-    });
+        this.setState({ clickEvent: event });
+    };
 
     logEvent = () => {
-        console.log(this.state.event.target);
+        try {
+            console.log(this.state.clickEvent.target);
+        } catch (err) {
+            console.log(err)
+        }
     };
 
     render() {

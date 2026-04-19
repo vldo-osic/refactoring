@@ -12,14 +12,14 @@ const Button = memo(function Button({
 export default function App() {
 	const [isVisible, setIsVisible] = useState(false);
 
-	const onClick = useCallback(() => {
-		setIsVisible(!isVisible);
+	const handleClick = useCallback(() => {
+		setIsVisible((prev) => !prev);
 	}, []);
 
 	return (
 		<>
-			<Button onClick={onClick} />
-			{isVisible && <div>lorem ipsum</div>}
+			<Button onClick={handleClick} />
+			{isVisible ? <div>lorem ipsum</div> : null}
 		</>
 	);
 }
