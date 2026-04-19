@@ -1,0 +1,28 @@
+{
+	"name": "refactoring",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build",
+		"format": "npx @biomejs/biome format --write",
+		"lint:fix": "npx @biomejs/biome lint --write",
+		"preview": "vite preview"
+	},
+	"dependencies": {
+		"react": "^19.2.4",
+		"react-dom": "^19.2.4"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.4.12",
+		"@eslint/js": "^9.39.4",
+		"@types/node": "^25.6.0",
+		"@types/react": "^19.2.14",
+		"@types/react-dom": "^19.2.3",
+		"@vitejs/plugin-react": "^6.0.1",
+		"globals": "^17.4.0",
+		"typescript": "^6.0.2",
+		"vite": "^8.0.4"
+	}
+}
