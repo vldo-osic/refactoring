@@ -6,7 +6,6 @@ import {
 	type PayloadAction,
 } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { RootState } from '../store';
 import { v4 as uuidv4 } from 'uuid';
 
 interface Todo {
@@ -38,7 +37,7 @@ const todoSlice = createSlice({
 	reducers: {
 		addTodo: (state, action: PayloadAction<string>) => {
 			const newTodo: Todo = {
-				id: 'uuidv4',
+				id: uuidv4(),
 				title: action.payload,
 				completed: false,
 			};

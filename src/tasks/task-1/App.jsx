@@ -1,30 +1,44 @@
-import React from "react";
-import sendMetric from "metrics";
-import sendData from "data";
-import bigComputations from "bigComputations";
+import bigComputations from 'bigComputations';
+import sendData from 'data';
+import sendMetric from 'metrics';
+import { useCallback, useEffect, useMemo } from 'react';
 
-const pleaseRevienMe = (props) => {
-	const [data, setDate] = React.useState(bigComputations(props.argument));
+const items = [{ id: 1 }, { id: 2 }, { id: 3 }];
 
-	const [items] = useState([{ id: 1 }, { id: 2 }, { id: 3 }]);
+export const PleaseRevienMe = (props) => {
+	const data = useMemo(
+		() => bigComputations(props.argument),
+		[props.argument],
+	);
 
-	React.useLayoutEffect(() => {
-		document.addEventListener("click", () => {
-			sendMetric("click");
-		});
-	});
+	useEffect(() => {
+		const handleClick = () => {
+			sendMetric('click');
+		};
 
-	const click = React.useCallback((id) => {
-		sendData(data, id);
-	});
+		document.addEventListener('click', handleClick);
+
+		return () => {
+			document.removeEventListener('click', handleClick);
+		};
+	}, []);
+
+	const handleSubmit = useCallback(
+		(id) => {
+			sendData(data, id);
+		},
+		[data],
+	);
 
 	return (
-		<React.Fragment>
-			{items.map((item) => (
-				<div onClick={() => click(item.id)}>{item.id}</div>
+		<ul>
+			{items.map(({ id }) => (
+				<li key={String(id)}>
+					<button onClick={() => handleSubmit(item.id)} type="submit">
+						{id}
+					</button>
+				</li>
 			))}
-		</React.Fragment>
+		</ul>
 	);
 };
-
-export pleaseRevienMe;

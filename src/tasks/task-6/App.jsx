@@ -1,20 +1,30 @@
+import { useState } from "react";
+
+const ZERO = 0;
+const NUMBERS = [1, 23, 4, 6, 21, 3]
+
+const List = () => (
+	<ul>
+		{NUMBERS.map((num, index) => (
+			<li key={String(index)}>{num}</li>
+		))}
+	</ul>
+)
+
 export default function App() {
-	const [count, setCount] = useState(0);
-	const [numbers] = useState([1, 23, 4, 6, 21, 3]);
+	const [count, setCount] = useState(ZERO);
+
+	const increment = () => {
+		setCount((prev) => prev + 1);
+	};
 
 	return (
 		<div>
-			<div>count</div>
-
-			<button onClick={() => setCount((count) => count + 1)}>
+			<h1>{count}</h1>
+			<button onClick={increment} type="button">
 				Increment
 			</button>
-
-			<ul>
-				{numbers.map((num) => (
-					<li>{num}</li>
-				))}
-			</ul>
+			<List />
 		</div>
 	);
 }

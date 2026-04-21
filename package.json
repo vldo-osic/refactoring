@@ -17,12 +17,17 @@
 	"devDependencies": {
 		"@biomejs/biome": "2.4.12",
 		"@eslint/js": "^9.39.4",
+		"@reduxjs/toolkit": "^2.11.2",
 		"@types/node": "^25.6.0",
 		"@types/react": "^19.2.14",
 		"@types/react-dom": "^19.2.3",
 		"@vitejs/plugin-react": "^6.0.1",
+		"axios": "^1.15.0",
 		"globals": "^17.4.0",
+		"react-redux": "^9.2.0",
+		"redux": "^5.0.1",
 		"typescript": "^6.0.2",
+		"uuid": "^13.0.0",
 		"vite": "^8.0.4"
 	}
 }
