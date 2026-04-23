@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 export default () => <div>Clicker</div>;
 
@@ -8,11 +8,17 @@ const heavyFunc = (count) => {
 };
 
 const LazyInit = (props) => {
-	const [count, setCount] = useState(heavyFunc(props.count));
+	const initCount = useMemo(() => heavyFunc(props.count), [props.count])
+	const [count, setCount] = useState(initCount);
+
+	const increment = () => {
+		setCount(prev => prev + 1);
+	};
+
 	return (
 		<>
-			{count}
-			<button onClick={() => setCount((prevProps) => ++prevProps)}>
+			<p>{count}</p>
+			<button onClick={increment}>
 				Increment
 			</button>
 		</>

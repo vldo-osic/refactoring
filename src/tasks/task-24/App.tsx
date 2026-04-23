@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useEffectEvent, useCallback, memo } from 'react';
 import ReactDOM from 'react-dom';
-import { fetchDate } from './api';
-import './styles/styles.css';
+// import { fetchDate } from './api';
+//import './styles/styles.css';
+
+const fetchDate = () => Promise.resolve(new Date());
 
 /**
  * Компонент для вывода серверного времени и высоты экрана
@@ -9,27 +11,46 @@ import './styles/styles.css';
 const App = () => {
 	const [count, setCount] = useState(0);
 	// Дата
-	const [date, setDate] = useState<string>();
-	const [clientWidth, setClientWidth] = useState<number>();
+	const [date, setDate] = useState<Date>();
+	const [clientWidth, setClientWidth] = useState<number>(document.body.clientWidth);
 
-	// @ts-expect-error
-	useEffect(async () => {
-		setDate(await fetchDate());
-
-		window.addEventListener('resize', () =>
-			setClientWidth(document.body.clientWidth),
-		);
+	useEffect(() => {
+		const loadDate = async () => {
+			try {
+				const newDate = await fetchDate();
+				setDate(newDate);
+			} catch (err) {
+				console.error(err);
+			}
+		}
+		
+		loadDate();
+	}, [])
+	
+	const handleResize = useEffectEvent(() => {
+		// можно еще debounce
+		setClientWidth(document.body.clientWidth);
 	});
+
+	useEffect(() => {
+		window.addEventListener('resize', handleResize);
+
+		return () => {
+			window.removeEventListener('resize', handleResize)
+		}
+	}, []);
+
+	const increment = useCallback(() => {
+		setCount((prev) => prev + 1);
+	}, [])
 
 	return (
 		<div className="App">
-			<div key="title">Server date: {date} </div>
+			<div key="title">Server date: {date?.getTime()} </div>
 			<div key="width">Client width: {clientWidth}px</div>
 			<Counter
 				value={count}
-				onClick={() => {
-					setCount(count + 1);
-				}}
+				onClick={increment}
 			/>
 		</div>
 	);
@@ -38,23 +59,15 @@ const App = () => {
 /*
  * Компонент, который выводит кол-во кликов в кнопку */
 
-function Counter(props: any) {
+const Counter = memo(({ value, onClick }: { value: number, onClick: () => void }) => {
 	console.log('CONNTER rendered [ ]');
-	/**
-	 * Percentage было что-то много...
-	 * Решил мексизировать этот callback.
-	 * НЕ УДАЛЯЙТЕ МЕМОИЗАЦИЮ, ПОЖАЛУЙСТА!
-	 */
-	const memoizedOnClick = useCallback(() => {
-		props.onClick();
-	}, []);
+	
 	return (
 		<div>
-			<button onClick={memoizedOnClick}>+</button>&nbsp;
-			{props.value || 0}
+			<button onClick={onClick} type='button'>+</button>
+			<p>{value ?? 0}</p>
 		</div>
 	);
-}
+})
 
-const rootElement = document.getElementById('root');
-ReactDOM.render(<App />, rootElement);
+export default App;

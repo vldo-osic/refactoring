@@ -1,18 +1,27 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function App() {
 	const [isVisible, setIsVisible] = useState(false);
-	const inputRef = useRef();
+	const inputRef = useRef(null);
 
 	const toggleInput = () => {
-		setIsVisible(true);
-		inputRef.current.focus();
+		setIsVisible((prev) => !prev);
 	};
+
+	useEffect(() => {
+		if (isVisible) {
+			inputRef?.current?.focus();
+		}
+	}, [isVisible])
 
 	return (
 		<div>
 			<button onClick={toggleInput}>Show and focus input</button>
-			{isVisible && <input ref={inputRef} type="text" />}
+			{isVisible ? (
+				<label>
+					<input ref={inputRef} type="text" />
+				</label>
+			) : null}
 		</div>
 	);
 }
