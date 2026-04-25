@@ -1,26 +1,29 @@
-import React, { type FC } from 'react';
-import './styles.css';
+import { type FC, memo, useMemo } from 'react';
+//import './styles.css';
 
-import { AppProvider, useApp } from './use-app';
-import { fibonacci } from './fibonacci';
+import { AppProvider, useCount, useIncrement, useNow } from './use-app';
 
-const ComplexComponent: FC<{ number: number }> = ({ number }) => {
+const fibonacci = (num: number): number => {
+	return num <= 1 ? num : fibonacci(num - 1) + fibonacci(num - 2);
+};
+interface ComplexComponentProps {
+	result: number;
+}
+
+const ComplexComponent: FC<ComplexComponentProps> = memo(({ result }) => {
 	console.log('ComplexComponent render');
-
-	const { increment } = useApp();
-	const expensiveComputationsResult = fibonacci(number);
-
+	const { increment } = useIncrement();
 	return (
 		<div>
-			result is: {expensiveComputationsResult}
-			<button onClick={increment}>increase count</button>
+			<p>result is: {result}</p>
+			<button onClick={increment} type='button'>increase count</button>
 		</div>
 	);
-};
+});
 
-const Clock = () => {
+const Clock = memo(() => {
 	console.log('Clock render');
-	const { now } = useApp();
+	const { now } = useNow();
 	return (
 		<h1>
 			{new Intl.DateTimeFormat('ru-RU', {
@@ -30,20 +33,24 @@ const Clock = () => {
 			}).format(now)}
 		</h1>
 	);
-};
+});
 
-const Count = () => {
+const Count = memo(() => {
 	console.log('Count render');
-	const { count } = useApp();
+	const { count } = useCount();
 	return <div>You clicked {count} times</div>;
-};
+});
 
-const OtherComponent = () => {
+const OtherComponent = memo(() => {
 	console.log('OtherComponent');
 	return <div>OtherComponent</div>;
-};
+});
+
+const FIBONACCI_NUM = 38;
 
 export default function App() {
+	const fibResult = useMemo(() => fibonacci(FIBONACCI_NUM), []);
+
 	return (
 		<AppProvider>
 			<h1>Improve perf & reduce rendres count</h1>
@@ -52,10 +59,10 @@ export default function App() {
 				react optimizations techniques
 			</p>
 			<hr style={{ marginBottom: 24 }} />
-			<ComplexComponent number={38} />
+			<ComplexComponent result={fibResult} />
 			<Clock />
 			<hr style={{ marginBottom: 24 }} />
-			<ComplexComponent number={38} />
+			<ComplexComponent result={fibResult} />
 			<Clock />
 			<Count />
 			<OtherComponent />
