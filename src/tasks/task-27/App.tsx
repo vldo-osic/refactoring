@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect, useEffectEvent, useMemo, useState } from 'react';
 
-function randomInteger(min, max) {
+function randomInteger(min: number, max: number) {
 	const rand = min + Math.random() * (max - min);
 	return Math.round(rand);
 }
@@ -8,28 +8,34 @@ function randomInteger(min, max) {
 // имитация запроса к серверу. просто получаем число асинхронно
 const randomNumber = () => Promise.resolve(randomInteger(9000, 11000));
 
-const testData = [];
-
-export const randomList = () => {
+const RandomList = () => {
 	const [number, setNumber] = useState(0);
 	const [scroll, setScroll] = useState(0);
+
+	const testData = useMemo(() => {
+		return Array.from({ length: number }).map(() => ({
+			value: randomInteger(0, 20),
+			id: crypto.randomUUID(),
+		}));
+	}, [number]);
+
+	const handleScroll = useEffectEvent(() => {
+		setScroll(window.screenY);
+	});
+
+	useEffect(() => {
+		window.addEventListener('scroll', handleScroll);
+		return () => {
+			window.removeEventListener('scroll', handleScroll);
+		};
+	});
 
 	useEffect(() => {
 		const fetchData = async () => {
 			setNumber(await randomNumber());
-			window.addEventListener('scroll', () => setScroll(window.scrollY));
-			for (let i = 0; i < number; i++) {
-				testData.push(randomInteger(0, 20));
-			}
 		};
 
 		fetchData();
-
-		return () => {
-			window.removeEventListener('scroll', () =>
-				setScroll(window.scrollY),
-			);
-		};
 	}, []);
 
 	return (
@@ -38,13 +44,15 @@ export const randomList = () => {
 			<div>Scroll: {scroll}</div>
 			<div>Список полученных значений</div>
 			<div style={{ height: 400, overflowY: 'hidden' }}>
-				{testData.map((el, index) => (
-					<div key={index}>
+				{testData.map(({ id, value }, index) => (
+					<div key={id}>
 						<div>Справочник {index}</div>
-						<div>{el}</div>
+						<div>{value}</div>
 					</div>
 				))}
 			</div>
 		</div>
 	);
 };
+
+export default RandomList;

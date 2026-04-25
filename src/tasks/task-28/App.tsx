@@ -1,46 +1,56 @@
-import React, { useEffect, useState } from 'react';
-import { fetchTasks } from './tasks-api';
+import { memo, useEffect, useEffectEvent, useState } from 'react';
 
-const ToDolist = ({ items }) => {
+// import { fetchTasks } from './tasks-api';
+
+interface ITask {
+	id: string;
+	text: string;
+}
+const fetchTasks = () => Promise.resolve([{ id: '1', text: 'abc' }]);
+
+interface TodoListProps {
+	items: ITask[];
+}
+const ToDoList = memo(({ items }: TodoListProps) => {
+	console.log('render')
 	return (
 		<div>
-			<ul>
-				{items.length &&
-					items.map((item, index) => (
-						<li key={index}>{item.text}</li>
-					))}
-			</ul>
+			<ul>{items.length && items.map(({ id, text }) => <li key={id}>{text}</li>)}</ul>
 		</div>
 	);
-};
+}, (prev, next) => JSON.stringify(prev) === JSON.stringify(next));
 
 const App = () => {
-	const [tasks, setTasks] = useState(null);
-	const handleRefreshTasks = (e) => {
-		if ((e.key = 'r')) {
-			const tasks = fetchTasks();
+	const [tasks, setTasks] = useState<ITask[]>([]);
+
+	const handleRefreshTasks = useEffectEvent(async (e: KeyboardEvent) => {
+		if (e.key === 'r') {
+			const tasks = await fetchTasks();
 			setTasks(tasks);
 		}
-	};
+	});
 
 	useEffect(() => {
 		document.addEventListener('keydown', handleRefreshTasks);
+		return () => {
+			document.removeEventListener('keydown', handleRefreshTasks);
+		};
 	});
 
 	return (
 		<div>
 			<h2>пример задач: </h2>
-			<ToDolist
+			<ToDoList
 				items={[
-					{ id: 1, text: 'Полить цветы' },
-					{ id: 2, text: 'Помыть машину' },
-					{ id: 3, text: 'Выкинуть мусор' },
+					{ id: '1', text: 'Полить цветы' },
+					{ id: '2', text: 'Помыть машину' },
+					{ id: '3', text: 'Выкинуть мусор' },
 				]}
 			/>
 			<h2>Сегодня:</h2>
-			<ToDolist items={tasks} />
+			<ToDoList items={tasks} />
 			<h2>Завтра:</h2>
-			<ToDolist items={[]} />
+			<ToDoList items={[]} />
 		</div>
 	);
 };
