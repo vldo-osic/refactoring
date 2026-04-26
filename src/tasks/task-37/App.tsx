@@ -1,38 +1,57 @@
-import React from 'react';
-import { useState } from 'react';
+import { type ChangeEvent, memo, useCallback, useMemo, useRef, useState } from 'react';
 
-export const App = () => {
-	const [someNumber] = useState(9);
+const SOME_NUMBER = 9;
+const heavyCalculation = () => {
+	console.log('heavyCalculation');
+	return SOME_NUMBER + Date.now();
+};
+
+const App = () => {
+	const [_someNumber] = useState(9);
 	const [text, setText] = useState('');
 
-	const heavyCalculation = () => {
-		console.log('heavyCalculation');
-		return someNumber + Date.now();
-	};
+	const textRef = useRef(text);
+	textRef.current = text;
 
-	const onSend = () => {
-		console.log('send text = ', text);
-	};
+	const heavyCalculationResult = useMemo(() => heavyCalculation(), []);
+
+	const handleSend = useCallback(() => {
+		console.log('send text = ', textRef.current);
+	}, []);
+
+	const handleSetText = useCallback((value: string) => {
+		setText(value);
+	}, []);
 
 	return (
 		<div>
-			<TextField text={text} setText={setText} />
-			<HeavySendButton onClick={onSend} />
+			<TextField text={text} onSetText={handleSetText} />
+			<HeavySendButton onClick={handleSend} />
 
-			<pre>{heavyCalculation()}</pre>
+			<pre>{heavyCalculationResult}</pre>
 
-			<button onClick={onSend}>Кнопка отправки 2</button>
+			<button onClick={handleSend}>Кнопка отправки 2</button>
 		</div>
 	);
 };
 
-const HeavySendButton = ({ onClick }) => {
+const HeavySendButton = memo(({ onClick }: { onClick: () => void }) => {
 	console.log('SendButton render');
 	return <button onClick={onClick}>Кнопка отправки 1</button>;
-};
+});
 
-const TextField = ({ text, setText }) => {
-	return (
-		<input value={text} onChange={(event) => setText(event.target.value)} />
-	);
-};
+const TextField = memo(
+	({ text, onSetText }: { text: string; onSetText: (text: string) => void }) => {
+		const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+			onSetText(event.target.value);
+		};
+
+		return (
+			<label>
+				<input value={text} onChange={handleChange} />
+			</label>
+		);
+	},
+);
+
+export default App;

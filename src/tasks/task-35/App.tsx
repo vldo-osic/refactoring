@@ -1,23 +1,22 @@
-import React, { useRef, useState, useEffect } from 'react';
+import { useState, memo } from 'react';
 
-const CountDisplay = (props) => {
-	const [val] = useState(props.c);
-	return <div>{val}</div>;
-};
+const CountDisplay = memo(({count}: { count: number }) => {
+	return <div>{count}</div>;
+});
 
 const App = () => {
 	const [count, setCount] = useState(0);
 
-	const handleClick = () => {
-		setCount((c) => c + 1);
+	const increment = () => {
+		setCount((prev) => prev + 1);
 	};
 
 	return (
 		<div>
-			<button onClick={handleClick}>
+			<button onClick={increment}>
 				<span>⚛️</span> {count}
 			</button>
-			<CountDisplay c={count} />
+			<CountDisplay count={count} />
 		</div>
 	);
 };

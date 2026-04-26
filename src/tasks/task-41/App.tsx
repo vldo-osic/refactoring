@@ -1,17 +1,17 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 
-export function App() {
+export default function App() {
 	const [count, setCount] = useState(0);
 	const [count2, setCount2] = useState({
 		name: 'Anton',
 	});
 
 	const handleBtnClick2 = () => {
-		count2.name = 'Alex';
+		setCount2({ name: 'Alex' });
 	};
 
 	const btnClick = () => {
-		setCount(count + 1);
+		setCount((prev) => prev + 1);
 	};
 
 	const handleBtnClick = useCallback(() => {

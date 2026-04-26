@@ -25,7 +25,7 @@ const initialState: TodoState = {
 };
 
 export const fetchTodos = createAsyncThunk('todos/fetchTodos', async () => {
-	const response = axios.get<Todo[]>(
+	const response = await axios.get<Todo[]>(
 		'https://jsonplaceholder.typicode.com/todos?_start=0&_end=10',
 	);
 	return response.data;
@@ -46,9 +46,12 @@ const todoSlice = createSlice({
 		toggleTodo: (state, action: PayloadAction<string>) => {
 			const todo = state.todos.find((todo) => todo.id === action.payload);
 			if (todo) {
-				todo.completed = todo.completed;
+				todo.completed = !todo.completed;
 			}
 		},
+		deleteTodo: (state, action: PayloadAction<string>) => {
+			state.todos = state.todos.filter(({ id }) => id !== action.payload)
+		}
 	},
 	extraReducers: (builder) => {
 		builder
@@ -66,8 +69,13 @@ const todoSlice = createSlice({
 				state.status = 'failed';
 			});
 	},
+	selectors: {
+		selectTodos: (state) => state.todos,
+		selectStatus: (state) => state.status,
+	}
 });
 
 export const { addTodo, toggleTodo, deleteTodo } = todoSlice.actions;
+export const { selectTodos, selectStatus } = todoSlice.selectors;
 
 export default todoSlice.reducer;
