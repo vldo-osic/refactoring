@@ -1,23 +1,23 @@
 // App.tsx
 
-import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import TodoList from './components/TodoList';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import AddTodoForm from './components/AddTodoForm';
+import TodoList from './components/TodoList';
 import { fetchTodos } from './features/todoSlice';
-import type { RootState } from './store';
+import type { AppDispatch } from './store';
 
 const App = () => {
-	const todos = useSelector((state: RootState) => state.todos.todos);
+	const dispatch = useDispatch<AppDispatch>();
 
-	fetchTodos();
+	useEffect(() => {
+		dispatch(fetchTodos());
+	}, [dispatch]);
 
 	return (
 		<div>
 			<AddTodoForm />
-			{todoStatus === 'loading' && <p>Loading...</p>}
-			{todoStatus === 'failed' && <p>Failed to load todos.</p>}
-			<TodoList todos={todos} />
+			<TodoList />
 		</div>
 	);
 };

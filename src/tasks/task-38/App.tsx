@@ -1,14 +1,17 @@
-export default function CounterApp()
-   let count = 0;
+import { useState } from "react";
 
-		const changeCount = () => {
-	    count += 1;
-	    }
-	    
-return (
-    <div className="App">
-	    <p>'Чтo произойдет при клике по кнопке</p>
-	    <hi>Count = {count}</hi>
-	    <button onClick={changeCount}>кнопка</button>
-    </div>
-});
+export default function CounterApp() {
+	const [count, setCount] = useState(0);
+
+	const increment = () => {
+		setCount(prev => prev + 1);
+	};
+
+	return (
+		<div className="App">
+			<p>'Чтo произойдет при клике по кнопке</p>
+			<h1>Count = {count}</h1>
+			<button onClick={increment}>кнопка</button>
+		</div>
+	);
+}

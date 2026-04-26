@@ -1,20 +1,23 @@
-import React, { useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const ToggleComponent = () => {
 	const [isVisible, setIsVisible] = useState(false);
-	const inputRef = useRef(null);
+	const inputRef = useRef<HTMLInputElement>(null);
+
+	useEffect(() => {
+		if (isVisible && inputRef.current) {
+			inputRef.current.focus();
+		}
+	}, [isVisible]);
 
 	const toggleVisibility = () => {
 		setIsVisible((prev) => !prev);
-		if (inputRef.current) {
-			inputRef.current.focus();
-		}
 	};
 
 	return (
 		<>
 			<button onClick={toggleVisibility}>Toggle Input</button>
-			{isVisible && <input ref={inputRef} />}
+			{isVisible ? <input ref={inputRef} /> : null}
 		</>
 	);
 };
